@@ -29,19 +29,6 @@ public class DeviceListActivity extends Activity {
     Runnable updateListTask = new Runnable() {
         @Override
         public void run() {
-//            updateListHandler.postDelayed(updateListTask, 3000);
-//            adapter.updateAllDevices(BLEScanner.activeDevices);
-
-//            String[] names = {"Ariel", "Jasmine", "Belle", "Eve", "Aeris", "Jasper"};
-//            long[] addresses = {890456783, 2342342, 23904895, 234234, 98043843, 1};
-//            int[] strengths = {-57, -89, -42, -35, -120, -105};
-//
-//            DeviceInfo[] examples = new DeviceInfo[6];
-//            for(int i = 0; i < 6; ++i) {
-//                examples[i] = new DeviceInfo(names[i], addresses[i], strengths[i], 0);
-//            }
-//            adapter.updateAllDevices(new ArrayList<DeviceInfo>(Arrays.asList(examples)));
-
             DeviceArrayAdapter adapter = new DeviceArrayAdapter(getApplicationContext(),
                     activeDevices.toArray(new DeviceInfo[activeDevices.size()]));
             listview.setAdapter(adapter);
@@ -103,10 +90,6 @@ public class DeviceListActivity extends Activity {
         DeviceInfo[] examples = new DeviceInfo[6];
         updateListHandler = new Handler();
 
-//        BLEScanner.init(
-//                ((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter(),
-//                this);
-//        BLEScanner.setTimeout(10);
         bta = ((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
         activeDevices = new ArrayList<DeviceInfo>();
         activeDevices.add(new DeviceInfo("Placeholder", 133742069, -69, 0));
@@ -134,26 +117,6 @@ public class DeviceListActivity extends Activity {
         DeviceArrayAdapter adapter = new DeviceArrayAdapter(this, activeDevices.toArray(new DeviceInfo[activeDevices.size()]));
         listview.setAdapter(adapter);
         updateListTask.run();
-
-//        Timer timer = new Timer();
-//        TimerTask task = new TimerTask() {
-//            @Override
-//            public void run() {
-////                ArrayList<DeviceInfo> newdevices = new ArrayList<DeviceInfo>();
-////                for(DeviceInfo deviceInfo : BLEScanner.activeDevices)
-////                {
-////                    newdevices.add(new DeviceInfo(deviceInfo.getName(),
-////                                                    deviceInfo.getMAC(),
-////                                                    deviceInfo.getStrength(),
-////                                                    deviceInfo.getLastSeen()));
-////                }
-////                adapter.updateAllDevices(newdevices);
-//            }
-//        };
-//
-////        timer.scheduleAtFixedRate(task, 15000, 5000);
-//        timer.schedule(task, 3000);
-
     }
 
 
