@@ -25,10 +25,12 @@ public class DeviceArrayAdapter extends ArrayAdapter<DeviceInfo> {
 
     public void addDevice(DeviceInfo newDevice) {
         devices.add(newDevice);
+        notifyDataSetChanged();
     }
 
     public void updateAllDevices(DeviceInfo[] myDevices) {
         devices = new ArrayList<DeviceInfo>(Arrays.asList(myDevices));
+        notifyDataSetChanged();
     }
 
     @Override

@@ -8,11 +8,13 @@ public class DeviceInfo {
     private String name;
     private long mac;
     private int strength;
+    private long lastseen;
 
-    public DeviceInfo(String deviceName, long deviceMAC, int signalStrength) {
+    public DeviceInfo(String deviceName, long deviceMAC, int signalStrength, long lastSeen) {
         name = deviceName;
         mac = deviceMAC;
         strength = signalStrength;
+        lastseen = lastSeen;
     }
 
     public String getName() {
@@ -26,6 +28,8 @@ public class DeviceInfo {
     public int getStrength() {
         return strength;
     }
+
+    public long getLastSeen() { return lastseen; }
 
     public void setName(String deviceName) {
         name = deviceName;
