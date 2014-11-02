@@ -40,7 +40,7 @@ public class DeviceListActivity
             DeviceArrayAdapter adapter = new DeviceArrayAdapter(getApplicationContext(),
                     activeDevices.toArray(new DeviceInfo[activeDevices.size()]));
             listview.setAdapter(adapter);
-            updateListHandler.postDelayed(updateListTask, 3000);
+            updateListHandler.postDelayed(updateListTask, 1000);
 
         }
     };
@@ -171,6 +171,8 @@ public class DeviceListActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.device_list, menu);
+        setTitle("Active Devices: " + sharepref.getString("location", "Location"));
+        getActionBar().setDisplayShowHomeEnabled(false);
         return true;
     }
 
@@ -193,6 +195,7 @@ public class DeviceListActivity
         clientTimeout = new Integer(
                sharepref.getString("timeout","5"));
         clientTimeout *= 60000;
+        setTitle("Active Devices: " + sharepref.getString("location", "Location"));
     }
 
     /**
