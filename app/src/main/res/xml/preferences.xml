@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="location"
+        android:defaultValue="default"
+        android:title="Location"
+        android:summary="location"
+        android:dialogTitle="Location"
+        />
+    <EditTextPreference
+        android:key="server"
+        android:defaultValue="default"
+        android:title="Server"
+        android:summary="server"
+        android:dialogTitle="Server"
+        />
+    <EditTextPreference
+        android:key="timeout"
+        android:defaultValue="5"
+        android:title="Timeout"
+        android:summary="timeout"
+        android:dialogTitle="Timeout"
+        />
+</PreferenceScreen>

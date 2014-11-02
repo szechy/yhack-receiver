@@ -3,5 +3,7 @@
 
     <string name="app_name">DeviceList</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_setup">SetupActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

@@ -7,8 +7,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -74,6 +76,8 @@ public class DeviceListActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //Import default values if no preferences have been set
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_list);
         if (savedInstanceState == null) {
@@ -123,7 +127,7 @@ public class DeviceListActivity extends Activity {
 
 
 
-/*    @Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.device_list, menu);
@@ -137,10 +141,12 @@ public class DeviceListActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(getApplicationContext(), SetupActivity.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }*/
+    }
 
     /**
      * A placeholder fragment containing a simple view.
