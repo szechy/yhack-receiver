@@ -69,6 +69,30 @@ public class WebClient {
 
     }
 
+    public void transmitUserMACPair(Context context, String user, long MAC)
+    {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("name", user);
+            jsonObject.put("address", MAC);
+        }catch (Exception ex)
+        {
+            //yololololol
+        }
+
+        StringEntity entity;
+        try {
+            entity = new StringEntity(jsonObject.toString());
+        }catch (Exception ex)
+        {
+            //yolo
+            return;
+        }
+
+        client.post(context, "http://104.236.63.179:8080/api/users", entity, "application/json", rhnull);
+
+    }
+
     public void setLocation(String location)
     {
         Location = location;

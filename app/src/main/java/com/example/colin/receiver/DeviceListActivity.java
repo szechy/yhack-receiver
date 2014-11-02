@@ -92,7 +92,7 @@ public class DeviceListActivity
             String strAddr = device.getAddress();
             String strAddrSimple = "";
             for (char c : strAddr.toCharArray()) {
-                if (c >= '0' && c <= '9') {
+                if (c != ':') {
                     strAddrSimple += c;
                 }
             }
@@ -137,7 +137,7 @@ public class DeviceListActivity
                 String strAddr = device.getAddress();
                 String strAddrSimple = "";
                 for (char c : strAddr.toCharArray()) {
-                    if (c >= '0' && c <= '9') {
+                    if (c != ':') {
                         strAddrSimple += c;
                     }
                 }
@@ -234,7 +234,7 @@ public class DeviceListActivity
                 client.sendActive(getApplicationContext(), activeDevices);
             }
         };
-        sendtimer.scheduleAtFixedRate(sendtask, 15000, 60000);
+        sendtimer.scheduleAtFixedRate(sendtask, 15000, 15000);
 
         for(int i = 0; i < 6; ++i) {
             examples[i] = new DeviceInfo(names[i], addresses[i], strengths[i], 0);
@@ -270,6 +270,18 @@ public class DeviceListActivity
             Intent intent = new Intent(getApplicationContext(), SetupActivity.class);
             startActivity(intent);
             return true;
+        }
+        if (id == R.id.testregister)
+        {
+            String strMACAddr = "7cd1c397884f";
+            String strAddrSimple = "";
+            for (char c : strMACAddr.toCharArray()) {
+                if (c != ':') {
+                    strAddrSimple += c;
+                }
+            }
+            long addr = Long.parseLong(strAddrSimple, 16);
+            client.transmitUserMACPair(getApplicationContext(), "Jasmine", addr);
         }
         return super.onOptionsItemSelected(item);
     }
