@@ -20,7 +20,7 @@ public class WebClient {
 
     String Location;
 
-    public static AsyncHttpClient client = new AsyncHttpClient(880);
+    public static AsyncHttpClient client = new AsyncHttpClient(8080);
 
     AsyncHttpResponseHandler rhnull = new AsyncHttpResponseHandler() {
         @Override
@@ -65,7 +65,7 @@ public class WebClient {
             //yolo
             return;
         }
-        client.post(context, "http://104.236.63.179/api/galileos", entity, "application/json", rhnull);
+        client.post(context, "http://104.236.63.179:8080/api/galileos", entity, "application/json", rhnull);
 
     }
 
