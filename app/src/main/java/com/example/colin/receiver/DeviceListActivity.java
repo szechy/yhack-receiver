@@ -6,12 +6,15 @@ import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +35,8 @@ public class DeviceListActivity
     ListView listview;
 
     SharedPreferences sharepref;
+
+    WebClient client;
 
     Handler updateListHandler;
     Runnable updateListTask = new Runnable() {
@@ -72,9 +77,18 @@ public class DeviceListActivity
     Timer scantimer;
     TimerTask scantask;
     Handler scanEndHandler;
+
+    Timer sendtimer;
+    TimerTask sendtask;
+
+    int rssiThreshold;
     final BluetoothAdapter.LeScanCallback scanCallback = new BluetoothAdapter.LeScanCallback() {
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+            if(-rssi > rssiThreshold)
+            {
+                return;
+            }
             String strAddr = device.getAddress();
             String strAddrSimple = "";
             for (char c : strAddr.toCharArray()) {
@@ -107,6 +121,52 @@ public class DeviceListActivity
         }
     };
 
+    BroadcastReceiver bluetoothScanReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            // When discovery finds a device
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // Get the BluetoothDevice object from the Intent
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                int rssi = 0;
+                if(intent.hasExtra(BluetoothDevice.EXTRA_RSSI))
+                {
+                    rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,(short)0);
+                }
+                String strAddr = device.getAddress();
+                String strAddrSimple = "";
+                for (char c : strAddr.toCharArray()) {
+                    if (c >= '0' && c <= '9') {
+                        strAddrSimple += c;
+                    }
+                }
+                long addr = Long.parseLong(strAddrSimple, 16);
+                boolean isNew = true;
+                for (DeviceInfo bledinfo : activeDevices) {
+
+                    if (addr == bledinfo.getMAC()) {
+                        activeDevices.remove(bledinfo);
+                        isNew = false;
+                        break;
+                    }
+                }
+                if(isNew)
+                {
+                    //TODO: Notify server
+                }
+
+                String strName = device.getName();
+                if(strName == null)
+                {
+                    strName = device.getAddress();
+                }
+                activeDevices.add(
+                        new DeviceInfo(strName, addr, rssi, System.currentTimeMillis()));
+            }
+        }
+    };
+
 
 
     @Override
@@ -114,17 +174,23 @@ public class DeviceListActivity
         //Import default values if no preferences have been set
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         sharepref = PreferenceManager.getDefaultSharedPreferences(this);
+
+
         clientTimeout = new Integer(sharepref.getString("timeout","5"));
         clientTimeout *= 60000;
+        rssiThreshold = new Integer(sharepref.getString("rssi_thresh","50"));
         sharepref.registerOnSharedPreferenceChangeListener(this);
+
         super.onCreate(savedInstanceState);
+
+        client = new WebClient(sharepref.getString("location", "location"));
+
         setContentView(R.layout.activity_device_list);
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
-
         listview = (ListView)findViewById(R.id.device_list);
         String[] names = {"Ariel", "Jasmine", "Belle", "Eve", "Edward", "Jasper"};
         long[] addresses = {890456783, 2342342, 23904895, 234234, 98043843, 1};
@@ -134,23 +200,41 @@ public class DeviceListActivity
 
 
         bta = ((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
+
         activeDevices = new ArrayList<DeviceInfo>();
         activeDevices.add(new DeviceInfo("Placeholder", 133742069, -69, 0));
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(bluetoothScanReceiver, filter);
         scanEndHandler = new Handler();
         scantimer = new Timer("BLE Scanner Timer");
         scantask = new TimerTask() {
             @Override
             public void run() {
-                scanEndHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        bta.stopLeScan(scanCallback);
+//                scanEndHandler.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        //bta.stopLeScan(scanCallback);
+//                    }
+//                }, 9000);
+                //bta.startLeScan(scanCallback)
+                if(!bta.isDiscovering()) {
+                    if(!bta.startDiscovery())
+                    {
+                        Log.e("Bluetooth", "Discovery Failed To Start");
                     }
-                }, 9000);
-                bta.startLeScan(scanCallback);
+                }
             }
         };
-        scantimer.scheduleAtFixedRate(scantask, 0, 10000);
+        scantimer.scheduleAtFixedRate(scantask, 0, 3000);
+
+        sendtimer = new Timer("Web Server Update Timer");
+        sendtask = new TimerTask() {
+            @Override
+            public void run() {
+                client.sendActive(getApplicationContext(), activeDevices);
+            }
+        };
+        sendtimer.scheduleAtFixedRate(sendtask, 10000, 60000);
 
         for(int i = 0; i < 6; ++i) {
             examples[i] = new DeviceInfo(names[i], addresses[i], strengths[i], 0);
@@ -195,7 +279,15 @@ public class DeviceListActivity
         clientTimeout = new Integer(
                sharepref.getString("timeout","5"));
         clientTimeout *= 60000;
-        setTitle("Active Devices: " + sharepref.getString("location", "Location"));
+        setTitle("Active Devices: " + sharepref.getString("location", "location"));
+        client.setLocation(sharepref.getString("location", "location"));
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        unregisterReceiver(bluetoothScanReceiver);
+        sharepref.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     /**

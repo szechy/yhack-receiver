@@ -25,10 +25,28 @@ public class SetupActivity
         serverpref.setSummary(serverpref.getText());
         EditTextPreference timeoutpref = (EditTextPreference)findPreference("timeout");
         timeoutpref.setSummary(timeoutpref.getText());
+        EditTextPreference threshpref = (EditTextPreference)findPreference("rssi_thresh");
+        threshpref.setSummary(threshpref.getText());
 
         locationpref.setOnPreferenceChangeListener(this);
         serverpref.setOnPreferenceChangeListener(this);
         timeoutpref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                String strValue = (String)newValue;
+                for(char c : strValue.toCharArray())
+                {
+                    if(!Character.isDigit(c))
+                    {
+                        return false;
+                    }
+                }
+                preference.setSummary(strValue);
+                return true;
+            }
+        });
+        threshpref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+        {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 String strValue = (String)newValue;

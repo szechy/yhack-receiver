@@ -21,4 +21,11 @@
         android:summary="timeout"
         android:dialogTitle="Timeout"
         />
+    <EditTextPreference
+        android:key="rssi_thresh"
+        android:defaultValue="50"
+        android:title="Threshold RSSI"
+        android:summary="rssi_thresh"
+        android:dialogTitle="Threshold RSSI"
+        />
 </PreferenceScreen>
