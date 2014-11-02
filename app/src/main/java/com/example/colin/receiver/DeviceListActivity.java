@@ -234,7 +234,7 @@ public class DeviceListActivity
                 client.sendActive(getApplicationContext(), activeDevices);
             }
         };
-        sendtimer.scheduleAtFixedRate(sendtask, 10000, 60000);
+        sendtimer.scheduleAtFixedRate(sendtask, 15000, 60000);
 
         for(int i = 0; i < 6; ++i) {
             examples[i] = new DeviceInfo(names[i], addresses[i], strengths[i], 0);

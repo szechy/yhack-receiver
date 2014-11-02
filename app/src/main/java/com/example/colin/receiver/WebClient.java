@@ -51,7 +51,7 @@ public class WebClient {
         }
         try {
             jsonParameters.put("locname", Location);
-            jsonParameters.put("current_users", jsonArray);
+            jsonParameters.put("currusers", jsonArray);
         }catch (Exception ex)
         {
             //yolo
